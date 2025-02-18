@@ -35,6 +35,16 @@ export const addSongsInPlaylist = async (data) => {
   return response.data;
 };
 
+export const deleteSongsFromPlaylist = async (data) => {
+  const response = await api({
+    method: "POST",
+    url: API_ENDPOINTS.DELETE_SONGS_IN_PLAYLIST(data.id),
+    data,
+  });
+
+  return response.data;
+};
+
 export const getPlaylistSongs = async (data) => {
   const response = await api({
     method: "GET",

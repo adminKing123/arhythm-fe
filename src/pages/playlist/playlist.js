@@ -111,7 +111,8 @@ const PlaylistHeader = ({ playlist }) => {
   useEffect(() => {
     if (
       currentPlaylist?.playlist?.id === playlist?.id &&
-      playby === "playlist"
+      playby === "playlist" &&
+      song
     ) {
       setThumbnail(song.album.thumbnail300x300);
     }
@@ -126,7 +127,11 @@ const PlaylistHeader = ({ playlist }) => {
         onContextMenu={(e) => e.preventDefault()}
       />
       <div className="w-64 aspect-square rounded overflow-hidden relative">
-        <img alt="thumbnail" src={get_src_uri(thumbnail)} onContextMenu={(e) => e.preventDefault()} />
+        <img
+          alt="thumbnail"
+          src={get_src_uri(thumbnail)}
+          onContextMenu={(e) => e.preventDefault()}
+        />
       </div>
       <div className="relative mb-2">
         <p className="text-white text-xs ml-1">
@@ -163,6 +168,7 @@ const SongsList = ({ data, playlist, isFetchingNextPage, hasNextPage }) => {
                   playlist
                 )
               }
+              renderedOn="playlistsong"
             />
           ))}
         </React.Fragment>
@@ -196,9 +202,6 @@ const Listing = () => {
       if (bottom && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
-      console.log(
-        e.target.scrollTop + e.target.clientHeight > e.target.scrollHeight - 10
-      );
     };
 
     const mainContent = document.getElementById("main-content");
