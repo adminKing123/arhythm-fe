@@ -16,7 +16,12 @@ import authConfigStore from "../../zstore/authConfigStore";
 import contextMenuStore from "../../zstore/contextMenuStore";
 import ROUTES from "../../router/routes";
 
-const SongCard = ({ song, renderedOn = "songs", setCallback }) => {
+const SongCard = ({
+  song,
+  renderedOn = "songs",
+  extraContextData = {},
+  setCallback,
+}) => {
   const setSong = playerStore((state) => state.setSong);
   const setContextMenuData = contextMenuStore((state) => state.setData);
 
@@ -31,6 +36,7 @@ const SongCard = ({ song, renderedOn = "songs", setCallback }) => {
       x: e.clientX,
       y: e.clientY,
       renderedOn,
+      extraContextData,
     });
   };
 

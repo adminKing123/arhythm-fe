@@ -169,6 +169,7 @@ const SongsList = ({ data, playlist, isFetchingNextPage, hasNextPage }) => {
                 )
               }
               renderedOn="playlistsong"
+              extraContextData={{ playlist }}
             />
           ))}
         </React.Fragment>
