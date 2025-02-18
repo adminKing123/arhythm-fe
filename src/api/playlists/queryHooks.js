@@ -62,10 +62,10 @@ export const useDeleteSongsFromPlaylistMutation = (id, config = {}) => {
       };
 
       queryClient.setQueryData([QUERY_KEYS.GET_PLAYLIST_SONGS, id], newData);
-
       if (
-        newData.pages.reduce((total, page) => total + page.results.length, 0) <
-        18
+        newData?.pages?.[0].count > 18 &&
+        newData.pages.reduce((total, page) => total + page.results.length, 0) <=
+          18
       )
         queryClient.fetchInfiniteQuery([QUERY_KEYS.GET_PLAYLIST_SONGS, id]);
     },
