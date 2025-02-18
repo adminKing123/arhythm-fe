@@ -1,6 +1,11 @@
 import { useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { AddToQueueSvg, DetailsSvg, ShareSvg } from "../../assets/svg";
+import {
+  AddToQueueSvg,
+  DeleteSvg,
+  DetailsSvg,
+  ShareSvg,
+} from "../../assets/svg";
 import playerStore from "../../zstore/playerStore";
 import {
   SHARE_APIS,
@@ -10,8 +15,36 @@ import {
 import ContextMenuButton from "./components";
 import authConfigStore from "../../zstore/authConfigStore";
 import contextMenuStore from "../../zstore/contextMenuStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ROUTES from "../../router/routes";
+import { useDeleteSongsFromPlaylistMutation } from "../../api/playlists/queryHooks";
+
+const SongRemoveFromPlaylist = ({ song, handleClose, callback }) => {
+  const id = parseInt(useParams().id);
+  const { mutate, isLoading } = useDeleteSongsFromPlaylistMutation(id, {
+    onSuccess: () => {
+      handleClose();
+    },
+  });
+
+  const handleRemove = () => {
+    if (!isLoading) {
+      mutate({
+        id: id,
+        songs_id: [song.id],
+      });
+      callback?.();
+    }
+  };
+
+  return (
+    <ContextMenuButton
+      Icon={DeleteSvg}
+      title={isLoading ? "Removing" : "Remove"}
+      onClick={handleRemove}
+    />
+  );
+};
 
 const SongShareButton = ({ song, callback }) => {
   const [copied, setCopied] = useState(false);
@@ -77,17 +110,28 @@ const SongContextMenu = ({ contextMenuData, handleClose }) => {
     >
       {user ? (
         <>
-          <AddToQueueOption song={contextMenuData.song} />
-          <ContextMenuButton
-            Icon={AddToQueueSvg}
-            title={"Add To Playlist"}
-            onClick={() =>
-              setContextMenuData({
-                type: "addtoplaylist",
-                song: contextMenuData.song,
-              })
-            }
-          />
+          {contextMenuData?.renderedOn === "playlistsong" ? (
+            <>
+              <SongRemoveFromPlaylist
+                song={contextMenuData.song}
+                handleClose={handleClose}
+              />
+            </>
+          ) : (
+            <>
+              <AddToQueueOption song={contextMenuData.song} />
+              <ContextMenuButton
+                Icon={AddToQueueSvg}
+                title={"Add To Playlist"}
+                onClick={() =>
+                  setContextMenuData({
+                    type: "addtoplaylist",
+                    song: contextMenuData.song,
+                  })
+                }
+              />
+            </>
+          )}
         </>
       ) : null}
       <ContextMenuButton
