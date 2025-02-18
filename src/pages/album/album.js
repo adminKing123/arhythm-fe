@@ -69,9 +69,6 @@ const Listing = () => {
       if (bottom && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
-      console.log(
-        e.target.scrollTop + e.target.clientHeight > e.target.scrollHeight - 10
-      );
     };
 
     const mainContent = document.getElementById("main-content");
