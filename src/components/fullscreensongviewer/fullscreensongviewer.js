@@ -14,6 +14,7 @@ import {
   RepeatSvg,
 } from "../../assets/svg";
 import authConfigStore from "../../zstore/authConfigStore";
+import diffViewsStore, { DIFF_VIEWS } from "../../zstore/diffViewsStore";
 
 const PlayOptions = () => {
   const playoption = playerStore((state) => state.playoption);
@@ -139,9 +140,9 @@ const PlayerControls = ({ playerRef }) => {
   );
 };
 
-const Options = ({ playerRef, className }) => {
+export const Options = ({ playerRef, className }) => {
   return (
-    <div className={`absolute bottom-4 ${className ?? ""}`}>
+    <div className={`${className ?? ""}`}>
       <PlayerControls playerRef={playerRef} />
       <div className="flex justify-center items-center gap-2 mt-2 opacity-5 hover:opacity-100 duration-300 transition-opacity">
         <LikeSongButton />
@@ -193,7 +194,7 @@ const CurrentSongImage = ({ song }) => {
   );
 };
 
-const BgImage = () => {
+export const BgImage = () => {
   const imgRef = useRef(null);
   const song = playerStore((state) => state.song);
 
@@ -249,7 +250,7 @@ const Duration = ({ playerRef }) => {
   return <p className="text-sm text-center mt-2">{remainingTime}</p>;
 };
 
-const CurrentSong = ({ playerRef, className }) => {
+export const CurrentSong = ({ playerRef, className }) => {
   const song = playerStore((state) => state.song);
   if (song === null) return null;
   return (
@@ -265,13 +266,15 @@ const CurrentSong = ({ playerRef, className }) => {
 };
 
 const FullScreenSongViewer = ({ playerRef }) => {
-  const [show, setShow] = useState(false);
+  const view = diffViewsStore((state) => state.view);
+  const setView = diffViewsStore((state) => state.setView);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.ctrlKey && event.key === "f") {
         event.preventDefault();
-        setShow((prev) => !prev);
+        if (view === DIFF_VIEWS.FULL_MUSIC_PLAYER) setView(null);
+        else setView(DIFF_VIEWS.FULL_MUSIC_PLAYER);
       }
     };
 
@@ -280,14 +283,14 @@ const FullScreenSongViewer = ({ playerRef }) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [view, setView]);
 
-  if (show)
+  if (view === DIFF_VIEWS.FULL_MUSIC_PLAYER)
     return ReactDOM.createPortal(
       <div className="bg-[#16151A] absolute top-0 left-0 w-screen h-screen z-50 flex justify-center items-center">
         <BgImage />
         <CurrentSong playerRef={playerRef} className={"relative"} />
-        <Options playerRef={playerRef} />
+        <Options playerRef={playerRef} className={"absolute bottom-4"} />
       </div>,
       document.body
     );

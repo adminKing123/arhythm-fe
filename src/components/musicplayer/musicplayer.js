@@ -20,6 +20,7 @@ import playerStore from "../../zstore/playerStore";
 import styles from "./musicplayer.module.css";
 import authConfigStore from "../../zstore/authConfigStore";
 import FullScreenSongViewer from "../fullscreensongviewer/fullscreensongviewer";
+import FullScreenSongShortVideo from "../fullscreensongviewer/FullScreenSongShortVideo";
 
 const PlayerControls = ({ playerRef }) => {
   const playNextBtnRef = useRef(null);
@@ -407,6 +408,7 @@ const MusicPlayer = () => {
         </div>
       </div>
       <FullScreenSongViewer playerRef={playerRef} />
+      <FullScreenSongShortVideo playerRef={playerRef} />
     </>
   );
 };

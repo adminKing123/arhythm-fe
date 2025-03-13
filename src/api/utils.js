@@ -25,6 +25,10 @@ export const get_src_uri = (path) => {
   return `${authConfigStore.getState().SRC_URI}${path}`;
 };
 
+export const get_short_video_src_uri = (path) => {
+  return `${authConfigStore.getState().SHORT_VIDEO_URI}${path}`;
+};
+
 export const numeral = (num) => {
   const formatter = new Intl.NumberFormat("en-US", {
     notation: "compact",
