@@ -27,14 +27,17 @@ const Video = ({ song, playerRef }) => {
   }, [playerRef]);
 
   return (
-    <video
-      ref={videoRef}
-      className="aspect-[9/16] h-full object-cover rounded-xl shadow-xl"
-      autoPlay
-      loop
-      muted
-      src={get_short_video_src_uri(song.short_video_url)}
-    ></video>
+    <>
+      <video
+        ref={videoRef}
+        className="h-[80%] aspect-video object-cover rounded-xl shadow-xl"
+        autoPlay
+        loop
+        muted
+        src={get_short_video_src_uri(song.short_video_url)}
+      ></video>
+      <h3 className="mt-2">{song.original_name}</h3>
+    </>
   );
 };
 
@@ -75,7 +78,7 @@ const FullScreenSongShortVideo = ({ playerRef }) => {
     return ReactDOM.createPortal(
       <div className="bg-[#16151A] absolute top-0 left-0 w-screen h-screen z-50 flex justify-center items-center">
         <BgImage />
-        <div className="relative h-full p-5">
+        <div className="relative h-full p-5 flex items-center justify-center flex-col">
           <PlaceholderContain playerRef={playerRef} />
           <Options
             playerRef={playerRef}
