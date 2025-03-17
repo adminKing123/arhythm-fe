@@ -36,7 +36,6 @@ const Video = ({ song, playerRef }) => {
         muted
         src={get_short_video_src_uri(song.short_video_url)}
       ></video>
-      <h3 className="mt-2">{song.original_name}</h3>
     </>
   );
 };
