@@ -135,37 +135,45 @@ const playerStore = create((set, get) => ({
   getRandomSongFromPlaylist: async () => {
     const { setSong, currentPlaylist } = get();
     set({ loadingSongFromURI: true });
-    const randomPlaylistSong = await getRandomPlaylistSong({
-      id: currentPlaylist.playlist.id,
-    });
-    setSong(randomPlaylistSong.song, false);
-    set({
-      currentPlaylist: {
-        playlist: currentPlaylist.playlist,
-        playlist_song_id: randomPlaylistSong.id,
-      },
-      playoption: "random",
-      playby: "playlist",
-    });
+    try {
+      const randomPlaylistSong = await getRandomPlaylistSong({
+        id: currentPlaylist.playlist.id,
+      });
+      setSong(randomPlaylistSong.song, false);
+      set({
+        currentPlaylist: {
+          playlist: currentPlaylist.playlist,
+          playlist_song_id: randomPlaylistSong.id,
+        },
+        playoption: "random",
+        playby: "playlist",
+      });
+    } catch (e) {
+      set({ loadingSongFromURI: false, playby: null });
+    }
   },
   seekFromPlaylist: async (loop, getwhat) => {
     const { setSong, currentPlaylist } = get();
     set({ loadingSongFromURI: true });
-    const playlistSongs = await getPlaylistSongsSeek({
-      id: currentPlaylist.playlist.id,
-      loop: loop ? "true" : "",
-      playlistsong_id: currentPlaylist.playlist_song_id,
-    });
-    const playlistsong = playlistSongs?.[getwhat];
-    if (playlistsong) {
-      setSong(playlistsong.song);
-      set({
-        currentPlaylist: {
-          playlist: currentPlaylist.playlist,
-          playlist_song_id: playlistsong.id,
-        },
+    try {
+      const playlistSongs = await getPlaylistSongsSeek({
+        id: currentPlaylist.playlist.id,
+        loop: loop ? "true" : "",
+        playlistsong_id: currentPlaylist.playlist_song_id,
       });
-    } else set({ loadingSongFromURI: false });
+      const playlistsong = playlistSongs?.[getwhat];
+      if (playlistsong) {
+        setSong(playlistsong.song);
+        set({
+          currentPlaylist: {
+            playlist: currentPlaylist.playlist,
+            playlist_song_id: playlistsong.id,
+          },
+        });
+      } else set({ loadingSongFromURI: false });
+    } catch (e) {
+      set({ loadingSongFromURI: false, playby: null });
+    }
   },
   getNextFromPlaylist: async () => {
     const { playoption, getRandomSongFromPlaylist, seekFromPlaylist } = get();
