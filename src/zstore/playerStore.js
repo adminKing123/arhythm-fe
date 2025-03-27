@@ -21,6 +21,7 @@ const playerStore = create((set, get) => ({
   addingInLiked: false,
   addingInHistory: false,
   playby: null,
+  setPlayby: (value) => set({ playby: value }),
 
   playoption: "playlistonce",
   setPlayoption: (value) => set({ playoption: value }),

@@ -15,7 +15,7 @@ import { ReactComponent as PlayerPrevSvg } from "./playerPrev.svg";
 import { ReactComponent as PauseSvg } from "./pause.svg";
 import { ReactComponent as VolumeFullSvg } from "./volumeFull.svg";
 import { ReactComponent as VolumeMuteSvg } from "./volumeMute.svg";
-import { ReactComponent as OpenPlaylistSvg } from "./openPlaylist.svg";
+import { ReactComponent as MoreOptionsSvg } from "./moreOptions.svg";
 import { ReactComponent as HeartSvg } from "./heart.svg";
 import { ReactComponent as AddSvg } from "./add.svg";
 import { ReactComponent as ArrowSvg } from "./arrow.svg";
@@ -31,6 +31,7 @@ import { ReactComponent as RandomSvg } from "./random.svg";
 import { ReactComponent as BookmarkSvg } from "./bookmark.svg";
 import { ReactComponent as ShareSvg } from "./share.svg";
 import { ReactComponent as DeleteSvg } from "./delete.svg";
+import { ReactComponent as InfoSvg } from "./info.svg";
 
 export {
   SignSvg,
@@ -50,7 +51,7 @@ export {
   PauseSvg,
   VolumeFullSvg,
   VolumeMuteSvg,
-  OpenPlaylistSvg,
+  MoreOptionsSvg,
   HeartSvg,
   AddSvg,
   ArrowSvg,
@@ -66,4 +67,5 @@ export {
   BookmarkSvg,
   ShareSvg,
   DeleteSvg,
+  InfoSvg,
 };
