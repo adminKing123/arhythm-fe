@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   formatPlayerTime,
   get_src_uri,
@@ -10,10 +10,12 @@ import { Fragment, useEffect, useRef } from "react";
 import { PlaySvg } from "../../assets/svg";
 import playerStore from "../../zstore/playerStore";
 import SongCard, { SongCardLoading } from "../../components/songcards/songcard";
+import ROUTES from "../../router/routes";
 
 const ArtistThumbnail = ({ artist }) => {
   const imgRef = useRef(null);
   const imgContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const imgEle = imgRef.current;
@@ -39,6 +41,7 @@ const ArtistThumbnail = ({ artist }) => {
     <div
       ref={imgContainerRef}
       className="w-10 skeleton relative flex flex-col items-center justify-center aspect-square rounded-xl overflow-hidden bg-[#000] group"
+      onClick={() => navigate(ROUTES.GET_ARTIST_URI(artist.id))}
     >
       <img
         ref={imgRef}
