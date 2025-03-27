@@ -27,9 +27,11 @@ const SongRemoveFromPlaylist = ({
   callback,
 }) => {
   const id = parseInt(useParams().id);
+  const navigate = useNavigate();
   const { mutate, isLoading } = useDeleteSongsFromPlaylistMutation(id, {
-    onSuccess: () => {
+    onSuccess: (data) => {
       handleClose();
+      if (data.playlistDeleted) navigate(ROUTES.YOURLIBRARY);
     },
   });
 
@@ -42,7 +44,7 @@ const SongRemoveFromPlaylist = ({
       callback?.();
     }
   };
-  
+
   if (user.id === playlist?.author?.id)
     return (
       <ContextMenuButton

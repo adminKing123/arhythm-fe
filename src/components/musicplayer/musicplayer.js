@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  AddToQueueSvg,
   HeartSvg,
-  OpenPlaylistSvg,
+  InfoSvg,
+  MoreOptionsSvg,
   PauseSvg,
   PlayerNextSvg,
   PlayerPrevSvg,
   PlaylistonceSvg,
+  PlaylistsSvg,
   PlaySvg,
   RandomSvg,
   ReleasesSvg,
@@ -21,6 +24,8 @@ import styles from "./musicplayer.module.css";
 import authConfigStore from "../../zstore/authConfigStore";
 import FullScreenSongViewer from "../fullscreensongviewer/fullscreensongviewer";
 import FullScreenSongShortVideo from "../fullscreensongviewer/FullScreenSongShortVideo";
+import ROUTES from "../../router/routes";
+import { useNavigate } from "react-router-dom";
 
 const PlayerControls = ({ playerRef }) => {
   const playNextBtnRef = useRef(null);
@@ -279,15 +284,90 @@ const PlayOptions = () => {
   );
 };
 
+const PlayingByOption = () => {
+  const navigate = useNavigate();
+  const playby = playerStore((state) => state.playby);
+
+  if (playby === "queue")
+    return (
+      <AddToQueueSvg
+        onClick={() => navigate(ROUTES.QUEUE)}
+        title="Open queue"
+        className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10"
+      />
+    );
+  else if (playby === "playlist")
+    return (
+      <PlaylistsSvg
+        title="Open playlist"
+        className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10"
+      />
+    );
+  else
+    return (
+      <MoreOptionsSvg className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10" />
+    );
+};
+
+const CanPlayByQueue = () => {
+  const setPlayby = playerStore((state) => state.setPlayby);
+  const playby = playerStore((state) => state.playby);
+  const queue = playerStore((state) => state.queue);
+  if (playby !== "queue" && queue.length)
+    return (
+      <AddToQueueSvg
+        onClick={() => setPlayby("queue")}
+        title="Play from queue"
+        className="w-6 h-6 fill-white hover:fill-[#25a56a]"
+      />
+    );
+};
+
+const PlayByNullOption = () => {
+  const setPlayby = playerStore((state) => state.setPlayby);
+  const playby = playerStore((state) => state.playby);
+  if (playby)
+    return (
+      <MoreOptionsSvg
+        onClick={() => setPlayby(null)}
+        className="w-6 h-6 fill-white hover:fill-[#25a56a]"
+      />
+    );
+};
+
+const DetailOption = () => {
+  const navigate = useNavigate();
+  const song = playerStore((state) => state.song);
+  if (song)
+    return (
+      <InfoSvg
+        title="Song details"
+        onClick={() => navigate(ROUTES.GET_SONG_URI(song.id))}
+        className="w-6 h-6 fill-white hover:fill-[#25a56a]"
+      />
+    );
+};
+
+const MoreOptions = ({ playerRef }) => {
+  return (
+    <div className="relative w-6 h-6 group cursor-pointer">
+      <div className="group-hover:flex p-1.5 bg-[#16151A] shadow-sm shadow-gray-500 rounded-3xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 invisible group-hover:visible flex-col gap-1 absolute -bottom-1.5 left-1/2 -translate-x-1/2">
+        <DetailOption />
+        <CanPlayByQueue />
+        <PlayByNullOption />
+        <div className="w-6 h-6 rounded-full"></div>
+      </div>
+      <PlayingByOption />
+    </div>
+  );
+};
+
 const ExtraOptions = ({ playerRef }) => {
   return (
     <div className="flex items-center gap-1">
       <LikeSongButton />
       <PlayOptions />
-      <OpenPlaylistSvg
-        className="w-6 h-6 fill-white hover:fill-[#25a56a] transition-colors duration-300"
-        title="Open Playlist"
-      />
+      <MoreOptions playerRef={playerRef} />
     </div>
   );
 };
