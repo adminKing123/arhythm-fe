@@ -284,6 +284,20 @@ const PlayOptions = () => {
   );
 };
 
+const PlayingByPlaylistButton = () => {
+  const navigate = useNavigate();
+  const currentPlaylist = playerStore((state) => state.currentPlaylist);
+  return (
+    <PlaylistsSvg
+      onClick={() =>
+        navigate(ROUTES.GET_PLAYLIST_URI(currentPlaylist.playlist.id))
+      }
+      title="Open playlist"
+      className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10"
+    />
+  );
+};
+
 const PlayingByOption = () => {
   const navigate = useNavigate();
   const playby = playerStore((state) => state.playby);
@@ -296,13 +310,7 @@ const PlayingByOption = () => {
         className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10"
       />
     );
-  else if (playby === "playlist")
-    return (
-      <PlaylistsSvg
-        title="Open playlist"
-        className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10"
-      />
-    );
+  else if (playby === "playlist") return <PlayingByPlaylistButton />;
   else
     return (
       <MoreOptionsSvg className="w-6 h-6 fill-white hover:fill-[#25a56a] relative group-hover:z-10" />
