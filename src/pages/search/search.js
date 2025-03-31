@@ -11,6 +11,7 @@ import {
 } from "../../components/songcards/songcard";
 import { getParamFromUrl, scrollTo } from "../../api/utils";
 import AskToAddRequestToAddSong from "../../components/addRequestToAddSong/AskToAddRequestToAddSong";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const FilterSongsContainer = ({ songs }) => {
   return (
@@ -196,7 +197,7 @@ const Search = () => {
   scrollTo("main-content", { top: 0, behavior: "instant" });
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <section className="p-[30px]">
         <div className="flex justify-between items-center flex-wrap">
           <h2 className="text-white text-[30px]">Search</h2>
@@ -205,7 +206,7 @@ const Search = () => {
       <section className="p-[30px] border-t border-b border-[#2a2a2a]">
         <SearchFilter />
       </section>
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

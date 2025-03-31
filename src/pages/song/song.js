@@ -11,6 +11,7 @@ import { PlaySvg } from "../../assets/svg";
 import playerStore from "../../zstore/playerStore";
 import SongCard, { SongCardLoading } from "../../components/songcards/songcard";
 import ROUTES from "../../router/routes";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const ArtistThumbnail = ({ artist }) => {
   const imgRef = useRef(null);
@@ -101,14 +102,14 @@ const Thumbnail = ({ song }) => {
           src={get_src_uri(song.album.thumbnail300x300)}
           onContextMenu={(e) => e.preventDefault()}
         />
-        <Link
+        <span
           onClick={() => {
             setSong(song);
           }}
-          className="flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
+          className="cursor-pointer flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
         >
           <PlaySvg className="w-5 h-5 fill-white sm:w-6 sm:h-6" />
-        </Link>
+        </span>
       </div>
     </>
   );
@@ -196,10 +197,10 @@ const Song = () => {
   }, [id]);
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <Details />
       <MoreRelatedSongs />
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

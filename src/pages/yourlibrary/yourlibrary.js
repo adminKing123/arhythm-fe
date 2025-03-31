@@ -3,6 +3,7 @@ import ROUTES from "../../router/routes";
 import { LibraryLatestHistorySongs } from "../../components/carousals/libraryHistorSongsCarousal";
 import { LibraryPlaylists } from "../../components/songcards/containers";
 import { scrollTo } from "../../api/utils";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const YourLibrary = () => {
   document.title = "Your Library";
@@ -16,14 +17,14 @@ const YourLibrary = () => {
   }
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <section className="p-[30px]">
         <LibraryLatestHistorySongs />
       </section>
       <section className="p-[30px]">
         <LibraryPlaylists />
       </section>
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

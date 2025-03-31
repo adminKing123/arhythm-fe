@@ -4,6 +4,7 @@ import { get_src_uri, numeral, scrollTo } from "../../api/utils";
 import SongCard, { SongCardLoading } from "../../components/songcards/songcard";
 import { useAlbumSongsInfinite } from "../../api/album/queryHooks";
 import Button from "../../components/buttons/buttons";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const AlbumHeader = ({ album, count }) => {
   return (
@@ -15,7 +16,11 @@ const AlbumHeader = ({ album, count }) => {
         onContextMenu={(e) => e.preventDefault()}
       />
       <div className="w-64 aspect-square rounded overflow-hidden relative">
-        <img alt="thumbnail" src={get_src_uri(album.thumbnail300x300)} onContextMenu={(e) => e.preventDefault()} />
+        <img
+          alt="thumbnail"
+          src={get_src_uri(album.thumbnail300x300)}
+          onContextMenu={(e) => e.preventDefault()}
+        />
       </div>
       <div className="relative mb-2">
         <h3 className="text-3xl font-bold text-white">{album.title}</h3>
@@ -122,7 +127,11 @@ const Album = () => {
     scrollTo("main-content", { top: 0, behavior: "instant" });
   }, [id]);
 
-  return <Listing />;
+  return (
+    <BlurAnimationPageChange>
+      <Listing />
+    </BlurAnimationPageChange>
+  );
 };
 
 export default Album;
