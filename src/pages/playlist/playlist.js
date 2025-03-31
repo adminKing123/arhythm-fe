@@ -69,6 +69,7 @@ const PlaylistPlayButton = ({ playlist }) => {
     };
 
     if (audioEle) {
+      handlePlayPauseEvent();
       audioEle.addEventListener("play", handlePlayPauseEvent);
       audioEle.addEventListener("pause", handlePlayPauseEvent);
       return () => {
