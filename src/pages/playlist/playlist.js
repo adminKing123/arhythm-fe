@@ -253,9 +253,11 @@ const Listing = () => {
 const Playlist = () => {
   document.title = "Playlist";
   scrollTo("main-content", { top: 0, behavior: "instant" });
-  return <BlurAnimationPageChange>
-  <Listing />;
-  </BlurAnimationPageChange>
+  return (
+    <BlurAnimationPageChange>
+      <Listing />
+    </BlurAnimationPageChange>
+  );
 };
 
 export default Playlist;
