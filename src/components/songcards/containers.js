@@ -3,6 +3,7 @@ import {
   useGetSongsLatestRelease,
   useGlobalSearch,
 } from "../../api/songs/queryHooks";
+import ROUTES from "../../router/routes";
 import AskToAddRequestToAddSong from "../addRequestToAddSong/AskToAddRequestToAddSong";
 import Button from "../buttons/buttons";
 import { HeroArtistsCarousal } from "../carousals";
@@ -27,7 +28,9 @@ export const NewRelesese = () => {
     <>
       <div className="flex justify-between items-center flex-wrap">
         <h2 className="text-white text-[30px]">New Releases</h2>
-        <NextLink className="text-[16px]">See All</NextLink>
+        <NextLink className="text-[16px]" href={ROUTES.SEARCH}>
+          See All
+        </NextLink>
       </div>
       {isLoading || isError ? (
         <div className="grid gap-[30px] mt-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-2">
@@ -51,7 +54,9 @@ export const HeroArtists = () => {
     <>
       <div className="flex justify-between items-center flex-wrap mb-8">
         <h2 className="text-white text-[30px]">Artists</h2>
-        <NextLink className="text-[16px]">See All</NextLink>
+        <NextLink className="text-[16px]" href={ROUTES.ARTISTS}>
+          See All
+        </NextLink>
       </div>
       <HeroArtistsCarousal />
     </>

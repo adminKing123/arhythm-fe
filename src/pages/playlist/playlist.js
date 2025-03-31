@@ -5,6 +5,7 @@ import { get_src_uri, numeral, scrollTo } from "../../api/utils";
 import SongCard, { SongCardLoading } from "../../components/songcards/songcard";
 import { PauseSvg, PlaySvg, RandomSvg } from "../../assets/svg";
 import playerStore from "../../zstore/playerStore";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const ShuffleToPlayPlaylist = ({ playlist }) => {
   const getRandomSongFromPlaylist = playerStore(
@@ -252,7 +253,9 @@ const Listing = () => {
 const Playlist = () => {
   document.title = "Playlist";
   scrollTo("main-content", { top: 0, behavior: "instant" });
-  return <Listing />;
+  return <BlurAnimationPageChange>
+  <Listing />;
+  </BlurAnimationPageChange>
 };
 
 export default Playlist;

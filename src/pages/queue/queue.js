@@ -8,6 +8,7 @@ import ROUTES from "../../router/routes";
 import authConfigStore from "../../zstore/authConfigStore";
 import playerStore from "../../zstore/playerStore";
 import contextMenuStore from "../../zstore/contextMenuStore";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const CurrentSongImage = ({ song }) => {
   const imgRef = useRef(null);
@@ -173,11 +174,11 @@ const Queue = () => {
   }
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <section className="p-[30px]">
         <QueueList />
       </section>
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

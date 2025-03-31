@@ -74,15 +74,15 @@ const SongCard = ({
           alt={song.album.id}
           src={get_src_uri(song.album.thumbnail300x300)}
         />
-        <Link
+        <span
           onClick={() => {
             setSong(song);
             setCallback?.(song);
           }}
-          className="flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
+          className="cursor-pointer flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
         >
           <PlaySvg className="w-5 h-5 fill-white sm:w-6 sm:h-6" />
-        </Link>
+        </span>
         <span className="absolute flex items-center justify-center w-full bottom-1 sm:bottom-[20px] opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <Link className="text-white fill-white text-[13px] mr-[15px] flex items-center gap-1">
             <PlaylistsSvg className="w-[13px] h-[13px]" />
@@ -188,12 +188,12 @@ export const SongCard2 = ({ song, setCallback }) => {
             src={get_src_uri(song.album.thumbnail300x300)}
             alt={song.album.id}
           />
-          <Link
+          <span
             onClick={handleSelect}
-            className="bg-[#000000af] flex justify-center items-center w-12 h-12 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl relative opacity-0 group-hover:opacity-100 transition-all duration-500"
+            className="cursor-pointer bg-[#000000af] flex justify-center items-center w-12 h-12 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl relative opacity-0 group-hover:opacity-100 transition-all duration-500"
           >
             <PlaySvg className="w-5 h-5 fill-[#25a56a] sm:w-6 sm:h-6" />
-          </Link>
+          </span>
         </div>
         <div className="ml-[15px] truncate">
           <ALink
@@ -303,16 +303,16 @@ export const SongCard3 = ({ index, song, setCallback, onClickRemove }) => {
             alt={song.album.id}
             onContextMenu={(e) => e.preventDefault()}
           />
-          <Link
+          <span
             onClick={handleSelect}
-            className={`bg-[#000000af] flex justify-center items-center w-12 h-12 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl relative ${
+            className={`cursor-pointer bg-[#000000af] flex justify-center items-center w-12 h-12 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl relative ${
               currentSong?.id === song.id
                 ? "opacity-100"
                 : "opacity-0 group-hover:opacity-100"
             } transition-all duration-500`}
           >
             <PlaySvg className="w-5 h-5 fill-[#25a56a] sm:w-6 sm:h-6" />
-          </Link>
+          </span>
         </div>
         <div className="ml-[15px] truncate">
           <ALink
