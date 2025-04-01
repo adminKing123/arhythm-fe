@@ -8,6 +8,7 @@ import {
 } from "../../components/songcards/songcard";
 import ROUTES from "../../router/routes";
 import authConfigStore from "../../zstore/authConfigStore";
+import { SearchSvg } from "../../assets/svg";
 
 const SongsList = ({ data, isFetchingNextPage, hasNextPage }) => {
   const groupedData = groupByDate(data);
@@ -32,6 +33,20 @@ const SongsList = ({ data, isFetchingNextPage, hasNextPage }) => {
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+const Options = () => {
+  return (
+    <div className="hidden 2md:block sticky top-0 h-screen p-[30px] rounded-lg pt-32 px-32">
+      <div className="flex justify-between items-center gap-3">
+        <SearchSvg className="flex-shrink-0 w-6 h-6 fill-white" />
+        <input
+          className="bg-transparent border-b flex-grow outline-none"
+          placeholder="Search History"
+        ></input>
+      </div>
     </div>
   );
 };
@@ -110,8 +125,9 @@ const History = () => {
 
   return (
     <BlurAnimationPageChange>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 2md:grid-cols-2">
         <Listing />
+        <Options />
       </div>
     </BlurAnimationPageChange>
   );
