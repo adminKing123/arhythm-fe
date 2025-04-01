@@ -31,6 +31,8 @@ const API_ENDPOINTS = {
 
   ADD_REQUEST_TO_ADD_SONG: `/song-requests/handle/`,
   GET_MORE_RELATED_SONGS: (id) => `/content/songs/${id}/related_songs/`,
+
+  GET_HISTORY_SONGS: `/content/songs-history/`,
 };
 
 export default API_ENDPOINTS;

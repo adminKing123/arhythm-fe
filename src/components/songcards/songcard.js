@@ -343,4 +343,99 @@ export const SongCard3 = ({ index, song, setCallback, onClickRemove }) => {
   );
 };
 
+export const HistorySongCardLoading = () => {
+  return (
+    <div className="h-[140px] flex gap-3">
+      <div className="skeleton relative flex flex-col items-center justify-center h-full aspect-square rounded-xl overflow-hidden bg-[#000] group flex-shrink-0"></div>
+      <div className="flex-grow flex flex-col py-3">
+        <div className="skeleton rounded-lg h-[18px] w-full"></div>
+        <div className="skeleton rounded-lg h-[12px] w-full mt-2"></div>
+      </div>
+    </div>
+  );
+};
+
+export const HistorySongCard = ({ song, setCallback }) => {
+  const setSong = playerStore((state) => state.setSong);
+  const imgRef = useRef(null);
+  const imgContainerRef = useRef(null);
+
+  useEffect(() => {
+    const imgEle = imgRef.current;
+    const imgContainerEle = imgContainerRef.current;
+
+    const handleLoaded = () => {
+      imgEle.classList.remove("opacity-0");
+      imgContainerEle.classList.remove("skeleton");
+      imgContainerEle.classList.add("group-hover:opacity-[0.6]");
+    };
+
+    if (imgEle && imgContainerRef) {
+      if (imgEle.complete) handleLoaded();
+      else imgEle.addEventListener("load", handleLoaded);
+
+      return () => {
+        imgEle.removeEventListener("load", handleLoaded);
+      };
+    }
+  }, [imgRef, imgContainerRef]);
+
+  return (
+    <div className="h-[140px] flex gap-3">
+      <div
+        ref={imgContainerRef}
+        // onContextMenu={handleContextMenu}
+        className="skeleton relative flex flex-col items-center justify-center h-full aspect-square rounded-xl overflow-hidden bg-[#000] group flex-shrink-0"
+      >
+        <img
+          ref={imgRef}
+          loading="lazy"
+          className="opacity-0 absolute top-0 left-0 w-full aspect-square group-hover:scale-[1.08] transition-all duration-500"
+          alt={song.album.id}
+          src={get_src_uri(song.album.thumbnail300x300)}
+        />
+        <span
+          onClick={() => {
+            setSong(song);
+            setCallback?.(song);
+          }}
+          className="cursor-pointer flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
+        >
+          <PlaySvg className="w-5 h-5 fill-white sm:w-6 sm:h-6" />
+        </span>
+      </div>
+      <div className="flex-grow truncate flex flex-col justify-between py-3">
+        <div>
+          <p className="text-lg text-white truncate">
+            <ALink href={ROUTES.GET_SONG_URI(song.id)}>
+              {song.original_name}
+            </ALink>
+          </p>
+          <p className="text-sm truncate">
+            <ALink href={ROUTES.GET_ALBUM_URI(song.album.id)}>
+              {song.album.title} ({song.album.year})
+            </ALink>
+          </p>
+        </div>
+        <div>
+          <p className="text-sm truncate">
+            <ArtistsLinks artists={song.artists} />
+          </p>
+          <span className="flex w-full">
+            <Link className="text-white fill-white text-[13px] mr-[15px] flex items-center gap-1">
+              <PlaylistsSvg className="w-[13px] h-[13px]" />
+              {numeral(song?.playlists_count || 0)}
+            </Link>
+            <Link className="text-white fill-white text-[13px] mr-[15px] flex items-center gap-1">
+              <HeadphoneSvg className="w-[13px] h-[13px]" />
+              {numeral(song.count)}
+            </Link>
+          </span>
+        </div>
+      </div>
+      <div className="py-3">Remove</div>
+    </div>
+  );
+};
+
 export default SongCard;
