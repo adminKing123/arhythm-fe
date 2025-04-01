@@ -19,6 +19,7 @@ const ROUTES = {
   GET_ARTIST_URI: (id) => `/artist/${id}`,
   ALBUM: "/album/:id",
   GET_ALBUM_URI: (id) => `/album/${id}`,
+  HISTORY: "/history",
 };
 
 export default ROUTES;
