@@ -16,6 +16,7 @@ import Playlist from "../pages/playlist/playlist";
 import Song from "../pages/song/song";
 import Artist from "../pages/artist/artist";
 import Album from "../pages/album/album";
+import History from "../pages/history/history";
 
 const Router = () => {
   return (
@@ -43,6 +44,7 @@ const Router = () => {
             <Route path={ROUTES.SONG} element={<Song />}></Route>
             <Route path={ROUTES.ARTIST} element={<Artist />}></Route>
             <Route path={ROUTES.ALBUM} element={<Album />}></Route>
+            <Route path={ROUTES.HISTORY} element={<History />}></Route>
           </Route>
         </Route>
       </Routes>
