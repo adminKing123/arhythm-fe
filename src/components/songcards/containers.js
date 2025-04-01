@@ -88,13 +88,12 @@ export const LibraryPlaylists = () => {
           })}
         </div>
       ) : (
-        <div className="col-span-full flex justify-center items-center p-8 rounded-lg shadow-lg">
+        <div className="col-span-full flex justify-center items-center p-8 rounded-lg">
           <div className="text-center">
             <h3 className="text-xl text-white mb-1">No Playlists Found</h3>
             <p className="text-gray-400 mb-2">
-              Looks like you don't have any playlists yet. Add your first one!
+              Looks like you don't have any playlists yet.
             </p>
-            <Button>Add Playlist</Button>
           </div>
         </div>
       )}

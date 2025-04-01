@@ -129,7 +129,7 @@ const Artist = () => {
 
   return (
     <BlurAnimationPageChange>
-      <Listing />;
+      <Listing />
     </BlurAnimationPageChange>
   );
 };
