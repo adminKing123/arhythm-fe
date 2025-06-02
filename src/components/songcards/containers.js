@@ -3,8 +3,8 @@ import {
   useGetSongsLatestRelease,
   useGlobalSearch,
 } from "../../api/songs/queryHooks";
+import ROUTES from "../../router/routes";
 import AskToAddRequestToAddSong from "../addRequestToAddSong/AskToAddRequestToAddSong";
-import Button from "../buttons/buttons";
 import { HeroArtistsCarousal } from "../carousals";
 import {
   ShowAlbumGR,
@@ -27,7 +27,9 @@ export const NewRelesese = () => {
     <>
       <div className="flex justify-between items-center flex-wrap">
         <h2 className="text-white text-[30px]">New Releases</h2>
-        <NextLink className="text-[16px]">See All</NextLink>
+        <NextLink className="text-[16px]" href={ROUTES.SEARCH}>
+          See All
+        </NextLink>
       </div>
       {isLoading || isError ? (
         <div className="grid gap-[30px] mt-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-2">
@@ -51,7 +53,9 @@ export const HeroArtists = () => {
     <>
       <div className="flex justify-between items-center flex-wrap mb-8">
         <h2 className="text-white text-[30px]">Artists</h2>
-        <NextLink className="text-[16px]">See All</NextLink>
+        <NextLink className="text-[16px]" href={ROUTES.ARTISTS}>
+          See All
+        </NextLink>
       </div>
       <HeroArtistsCarousal />
     </>
@@ -83,13 +87,12 @@ export const LibraryPlaylists = () => {
           })}
         </div>
       ) : (
-        <div className="col-span-full flex justify-center items-center p-8 rounded-lg shadow-lg">
+        <div className="col-span-full flex justify-center items-center p-8 rounded-lg">
           <div className="text-center">
             <h3 className="text-xl text-white mb-1">No Playlists Found</h3>
             <p className="text-gray-400 mb-2">
-              Looks like you don't have any playlists yet. Add your first one!
+              Looks like you don't have any playlists yet.
             </p>
-            <Button>Add Playlist</Button>
           </div>
         </div>
       )}

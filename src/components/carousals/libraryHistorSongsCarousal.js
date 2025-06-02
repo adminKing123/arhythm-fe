@@ -167,7 +167,9 @@ export const LibraryLatestHistorySongs = () => {
     <>
       <div className="flex justify-between items-center flex-wrap mb-8">
         <h2 className="text-white text-[30px]">History</h2>
-        <NextLink className="text-[16px]">See All</NextLink>
+        <NextLink className="text-[16px]" href={ROUTES.HISTORY}>
+          See All
+        </NextLink>
       </div>
       <LibraryHistorSongsCarousal data={data} />
     </>

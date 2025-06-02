@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   formatPlayerTime,
   get_src_uri,
@@ -10,10 +10,13 @@ import { Fragment, useEffect, useRef } from "react";
 import { PlaySvg } from "../../assets/svg";
 import playerStore from "../../zstore/playerStore";
 import SongCard, { SongCardLoading } from "../../components/songcards/songcard";
+import ROUTES from "../../router/routes";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const ArtistThumbnail = ({ artist }) => {
   const imgRef = useRef(null);
   const imgContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const imgEle = imgRef.current;
@@ -39,6 +42,7 @@ const ArtistThumbnail = ({ artist }) => {
     <div
       ref={imgContainerRef}
       className="w-10 skeleton relative flex flex-col items-center justify-center aspect-square rounded-xl overflow-hidden bg-[#000] group"
+      onClick={() => navigate(ROUTES.GET_ARTIST_URI(artist.id))}
     >
       <img
         ref={imgRef}
@@ -98,14 +102,14 @@ const Thumbnail = ({ song }) => {
           src={get_src_uri(song.album.thumbnail300x300)}
           onContextMenu={(e) => e.preventDefault()}
         />
-        <Link
+        <span
           onClick={() => {
             setSong(song);
           }}
-          className="flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
+          className="cursor-pointer flex justify-center items-center w-10 h-10 rounded-lg sm:w-14 sm:h-14 sm:rounded-xl bg-[#222227] relative scale-[0.8] opacity-0 group-hover:scale-[1] group-hover:opacity-100 transition-all duration-500"
         >
           <PlaySvg className="w-5 h-5 fill-white sm:w-6 sm:h-6" />
-        </Link>
+        </span>
       </div>
     </>
   );
@@ -193,10 +197,10 @@ const Song = () => {
   }, [id]);
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <Details />
       <MoreRelatedSongs />
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

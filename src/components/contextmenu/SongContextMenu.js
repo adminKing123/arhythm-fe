@@ -19,11 +19,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import ROUTES from "../../router/routes";
 import { useDeleteSongsFromPlaylistMutation } from "../../api/playlists/queryHooks";
 
-const SongRemoveFromPlaylist = ({ song, handleClose, callback }) => {
+const SongRemoveFromPlaylist = ({
+  song,
+  playlist,
+  user,
+  handleClose,
+  callback,
+}) => {
   const id = parseInt(useParams().id);
+  const navigate = useNavigate();
   const { mutate, isLoading } = useDeleteSongsFromPlaylistMutation(id, {
-    onSuccess: () => {
+    onSuccess: (data) => {
       handleClose();
+      if (data.playlistDeleted) navigate(ROUTES.YOURLIBRARY);
     },
   });
 
@@ -37,13 +45,15 @@ const SongRemoveFromPlaylist = ({ song, handleClose, callback }) => {
     }
   };
 
-  return (
-    <ContextMenuButton
-      Icon={DeleteSvg}
-      title={isLoading ? "Removing" : "Remove"}
-      onClick={handleRemove}
-    />
-  );
+  if (user.id === playlist?.author?.id)
+    return (
+      <ContextMenuButton
+        Icon={DeleteSvg}
+        title={isLoading ? "Removing" : "Remove"}
+        onClick={handleRemove}
+      />
+    );
+  else return null;
 };
 
 const SongShareButton = ({ song, callback }) => {
@@ -115,6 +125,8 @@ const SongContextMenu = ({ contextMenuData, handleClose }) => {
               <SongRemoveFromPlaylist
                 song={contextMenuData.song}
                 handleClose={handleClose}
+                playlist={contextMenuData?.extraContextData.playlist}
+                user={user}
               />
             </>
           ) : (

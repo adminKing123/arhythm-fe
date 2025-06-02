@@ -6,6 +6,7 @@ import { getParamFromUrl, scrollTo } from "../../api/utils";
 import AlbumCard, {
   AlbumCardLoading,
 } from "../../components/songcards/albumcard";
+import { BlurAnimationPageChange } from "../../components/AnimationsWrappers";
 
 const FilterAlbumsContainer = ({ albums }) => {
   return (
@@ -115,7 +116,7 @@ const Albums = () => {
   scrollTo("main-content", { top: 0, behavior: "instant" });
 
   return (
-    <>
+    <BlurAnimationPageChange>
       <section className="p-[30px]">
         <div className="flex justify-between items-center flex-wrap">
           <h2 className="text-white text-[30px]">Albums</h2>
@@ -124,7 +125,7 @@ const Albums = () => {
       <section className="p-[30px] border-t border-b border-[#2a2a2a]">
         <SearchFilter />
       </section>
-    </>
+    </BlurAnimationPageChange>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import authConfigStore from "../zstore/authConfigStore";
+import { format, isToday, isYesterday, differenceInDays } from "date-fns";
 import { baseURL } from ".";
 
 const tokenManager = {
@@ -23,6 +24,10 @@ const tokenManager = {
 
 export const get_src_uri = (path) => {
   return `${authConfigStore.getState().SRC_URI}${path}`;
+};
+
+export const get_short_video_src_uri = (path) => {
+  return `${authConfigStore.getState().SHORT_VIDEO_URI}${path}`;
 };
 
 export const numeral = (num) => {
@@ -175,6 +180,41 @@ export const SHARE_APIS = {
   PLAYLIST: (id) => `${baseURL}/share/content/playlists/${id}`,
   ALBUM: (id) => `${baseURL}/share/content/albums/${id}`,
   ARTIST: (id) => `${baseURL}/share/content/artists/${id}`,
+};
+
+export function formatDateTime(dateTime) {
+  const date = new Date(dateTime);
+  const now = new Date();
+
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+
+  const diffDays = differenceInDays(now, date);
+
+  if (diffDays < 7) return format(date, "EEEE"); // Day name (e.g., Monday)
+  if (now.getFullYear() === date.getFullYear()) return format(date, "MMM d"); // Month & Day (e.g., Mar 31)
+
+  return format(date, "yyyy, MMM d"); // Year, Month & Day (e.g., 2024, Mar 31)
+}
+
+export const groupByDate = (data) => {
+  const grouped = {};
+
+  data.forEach((page) => {
+    page.results.forEach((history_song) => {
+      const date = new Date(history_song.accessed_at)
+        .toISOString()
+        .split("T")[0];
+
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+
+      grouped[date].push(history_song);
+    });
+  });
+
+  return grouped;
 };
 
 export default tokenManager;

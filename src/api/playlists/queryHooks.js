@@ -83,7 +83,6 @@ export const usePlaylistSongsInfinite = (id, limit = 24, config = {}) =>
         (total, page) => total + page.results.length,
         0
       );
-      console.log(nextOffset);
       return lastPage?.next ? nextOffset : undefined;
     },
     retry: 1,
