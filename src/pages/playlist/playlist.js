@@ -186,7 +186,7 @@ const SongsList = ({ data, playlist, isFetchingNextPage, hasNextPage }) => {
 };
 
 const Listing = () => {
-  const id = parseInt(useParams().id);
+  const id = useParams().id;
   const {
     isError,
     isLoading,
