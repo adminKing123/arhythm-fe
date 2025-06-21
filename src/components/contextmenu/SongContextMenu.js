@@ -26,7 +26,7 @@ const SongRemoveFromPlaylist = ({
   handleClose,
   callback,
 }) => {
-  const id = parseInt(useParams().id);
+  const id = useParams().id;
   const navigate = useNavigate();
   const { mutate, isLoading } = useDeleteSongsFromPlaylistMutation(id, {
     onSuccess: (data) => {

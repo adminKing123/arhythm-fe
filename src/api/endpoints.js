@@ -24,7 +24,10 @@ const API_ENDPOINTS = {
   CREATE_PLAYLIST: "/content/playlists/",
   GET_PLAYLISTS: "/content/playlists/",
   ADD_SONGS_IN_PLAYLIST: (id) => `/content/playlists/${id}/add_songs/`,
-  DELETE_SONGS_IN_PLAYLIST: (id) => `/content/playlists/${id}/remove_songs/`,
+  DELETE_SONGS_IN_PLAYLIST: (id) => {
+    if (id === "liked_songs") return `/content/likedsongsseeker/remove_songs/`;
+    return `/content/playlists/${id}/remove_songs/`;
+  },
   GET_PLAYLIST_SONGS: (id) => {
     if (id === "liked_songs") return `/content/likedsongsseeker/songs`;
     return `/content/playlistseeker/${id}/songs`;
