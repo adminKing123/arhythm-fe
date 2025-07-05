@@ -16,6 +16,7 @@ import MusicPlayer from "../musicplayer/musicplayer";
 import playerStore from "../../zstore/playerStore";
 import sidebarStore from "../../zstore/sidebarStore";
 import { useEffect } from "react";
+import { SidebarOptionSignLogout } from "../header/header";
 
 const QueueNavbarTab = () => {
   const queue = playerStore((state) => state.queue);
@@ -76,11 +77,11 @@ const SideNavbar = () => {
       <SidebarOverlay open={open} toggleSidebar={toggleSidebar} />
       <div
         className={`bg-[#16151A] h-[100dvh] flex-shrink-0 overflow-hidden transition-[width] duration-300 absolute top-0 left-0 z-10 2lg:static ${
-          open ? "w-[260px] border-[#222227] border-r" : "w-0"
+          open ? "w-[280px] border-[#222227] border-r" : "w-0"
         }`}
         id="sidebar"
       >
-        <div className="w-[260px] h-[100dvh] flex flex-col">
+        <div className="w-[280px] h-[100dvh] flex flex-col">
           <div className="flex-shrink-0 border-[#222227] border-b h-[70px] px-[30px] flex items-center justify-between">
             <img src={Logo} alt="logo" className="h-6" />
             <span
@@ -113,6 +114,12 @@ const SideNavbar = () => {
                 Your Library
               </NavbarTab>
             )}
+            {user ? (
+              <>
+                <hr className="border-[#222227]" />
+                <SidebarOptionSignLogout user={user} />
+              </>
+            ) : null}
           </div>
           <MusicPlayer />
         </div>
