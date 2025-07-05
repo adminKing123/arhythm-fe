@@ -116,7 +116,7 @@ const SideNavbar = () => {
             )}
             {user ? (
               <>
-                <hr className="border-[#222227]" />
+                <hr className="border-[#222227] sm:hidden" />
                 <SidebarOptionSignLogout user={user} />
               </>
             ) : null}
