@@ -7,6 +7,8 @@ import A, { ALink } from "../links/links";
 import { useDebounce } from "use-debounce";
 import { GlobalSearchContainer } from "../songcards/containers";
 import pageItemsStore from "../../zstore/pageItemsStore";
+import sidebarStore from "../../zstore/sidebarStore";
+import { createPortal } from 'react-dom';
 
 const Tab = ({ children }) => {
   return (
@@ -150,7 +152,7 @@ const SearchInput = () => {
       className={`
       ${
         isSearching
-          ? "absolute top-0 left-0 z-[60] w-screen flex justify-center bg-[#00000030] h-screen"
+          ? "absolute top-0 left-0 z-[60] w-screen flex justify-center bg-[#16151A]/75 h-screen"
           : ""
       }`}
       onClick={handleClose}
@@ -214,23 +216,21 @@ const SearchInput = () => {
 };
 
 const SideBarToggler = () => {
-  const [isOpen, setOpen] = useState(false);
+  const open = sidebarStore((state) => state.open);
+  const setOpen = sidebarStore((state) => state.setOpen);
 
-  const handleMenuClick = () => {
-    const sidebar = document.getElementById("sidebar");
-    const left = isOpen ? "-280px" : "0px";
-    sidebar.style.left = left;
-    setOpen(!isOpen);
+  const toggleSidebar = () => {
+    setOpen(!open);
   };
 
+  if (open && window.innerWidth > 1200) return null;
   return (
-    <div
-      className="items-center ml-4 m2lg:flex hidden"
-      onClick={handleMenuClick}
-    >
-      <MenuSvg
-        className={`w-6 h-6 ${isOpen ? "stroke-[#25a56a]" : "stroke-white"}`}
-      />
+    <div className="h-[70px] flex items-center mr-8">
+      <button onClick={toggleSidebar}>
+        <MenuSvg
+          className={`w-6 h-6 ${open ? "stroke-[#25a56a]" : "stroke-white"}`}
+        />
+      </button>
     </div>
   );
 };
@@ -240,7 +240,8 @@ const Header = () => {
   const showGlobalSearch = pageItemsStore((state) => state.showGlobalSearch);
 
   return (
-    <div className="z-10 h-[70px] border-[#222227] border-b px-[30px] bg-[#16151A] flex m2lg:sticky m2lg:top-0">
+    <div className="h-[70px] border-[#222227] border-b px-[30px] bg-[#16151A] flex">
+      <SideBarToggler />
       <div className="flex h-full items-center gap-[30px] flex-grow">
         {user && <Tab>Profile</Tab>}
         <Tab>About</Tab>
@@ -254,7 +255,6 @@ const Header = () => {
       <div className="hidden items-center sm:flex md:ml-0 ml-8">
         <OptionSignLogout user={user} />
       </div>
-      <SideBarToggler />
     </div>
   );
 };
