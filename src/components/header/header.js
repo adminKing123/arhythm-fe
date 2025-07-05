@@ -42,6 +42,31 @@ const OptionSignLogout = ({ user }) => {
   );
 };
 
+export const SidebarOptionSignLogout = ({ user }) => {
+  const handleLogout = () => {
+    tokenManager.removeToken();
+    window.location = ROUTES.LOGIN;
+  };
+
+  return user ? (
+    <A
+      onClick={handleLogout}
+      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline"
+    >
+      <SignSvg className="fill-[#c0c0c0] w-6 h-6" />
+      <span className="text-nowrap text-[#c0c0c0]">Logout</span>
+    </A>
+  ) : (
+    <A
+      href={ROUTES.LOGIN}
+      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline"
+    >
+      <SignSvg className="fill-[#c0c0c0] w-6 h-6" />
+      <span className="text-nowrap text-[#c0c0c0]">Sign In</span>
+    </A>
+  );
+};
+
 const ShowLastGbSearches = ({ gbSearchHistory, clearHistory, setQ }) => {
   return (
     <div className="bg-[#16151A] border border-[#222227] rounded-xl top-2 absolute min-w-[280px] w-full max-w-[740px] pt-[70px] px-6 pb-6">
