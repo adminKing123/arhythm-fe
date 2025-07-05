@@ -8,7 +8,6 @@ import { useDebounce } from "use-debounce";
 import { GlobalSearchContainer } from "../songcards/containers";
 import pageItemsStore from "../../zstore/pageItemsStore";
 import sidebarStore from "../../zstore/sidebarStore";
-import { createPortal } from 'react-dom';
 
 const Tab = ({ children }) => {
   return (
