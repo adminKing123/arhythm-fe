@@ -51,7 +51,7 @@ export const SidebarOptionSignLogout = ({ user }) => {
   return user ? (
     <A
       onClick={handleLogout}
-      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline"
+      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline sm:hidden"
     >
       <SignSvg className="fill-[#c0c0c0] w-6 h-6" />
       <span className="text-nowrap text-[#c0c0c0]">Logout</span>
@@ -59,7 +59,7 @@ export const SidebarOptionSignLogout = ({ user }) => {
   ) : (
     <A
       href={ROUTES.LOGIN}
-      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline"
+      className="h-fit flex items-center gap-3 border-l border-[#222227] cursor-pointer hover:no-underline sm:hidden"
     >
       <SignSvg className="fill-[#c0c0c0] w-6 h-6" />
       <span className="text-nowrap text-[#c0c0c0]">Sign In</span>
