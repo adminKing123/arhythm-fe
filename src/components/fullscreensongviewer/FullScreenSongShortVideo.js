@@ -14,29 +14,40 @@ const Video = ({ song, playerRef }) => {
     const audioElement = playerRef.current.audio.current;
     const videoElement = videoRef.current;
 
-    const handlePlay = () => videoElement.play();
-    const handlePause = () => videoElement.pause();
+    const syncVideoWithAudio = () => {
+      const audioTime = audioElement.currentTime;
+      const videoDuration = videoElement.duration || 1; // prevent NaN or divide by 0
+      videoElement.currentTime = audioTime % videoDuration;
+    };
+
+    const handlePlay = () => {
+      videoElement.play();
+    };
+
+    const handlePause = () => {
+      videoElement.pause();
+    };
 
     audioElement.addEventListener("play", handlePlay);
     audioElement.addEventListener("pause", handlePause);
+    audioElement.addEventListener("timeupdate", syncVideoWithAudio);
 
     return () => {
       audioElement.removeEventListener("play", handlePlay);
       audioElement.removeEventListener("pause", handlePause);
+      audioElement.removeEventListener("timeupdate", syncVideoWithAudio);
     };
   }, [playerRef]);
 
   return (
-    <>
-      <video
-        ref={videoRef}
-        className="h-[80%] aspect-video object-cover rounded-xl shadow-xl"
-        autoPlay
-        loop
-        muted
-        src={get_short_video_src_uri(song.short_video_url)}
-      ></video>
-    </>
+    <video
+      ref={videoRef}
+      className="h-[80%] aspect-video object-cover rounded-xl shadow-xl"
+      autoPlay
+      muted
+      loop
+      src={get_short_video_src_uri(song.short_video_url)}
+    />
   );
 };
 
