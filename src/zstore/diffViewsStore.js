@@ -3,6 +3,7 @@ import { create } from "zustand";
 export const DIFF_VIEWS = {
   FULL_MUSIC_PLAYER: "FULL_MUSIC_PLAYER",
   FULL_MUSIC_WITH_SHORT_VIDEO: "FULL_MUSIC_WITH_SHORT_VIDEO",
+  FULL_SONG_VISUALIZER_A1: "FULL_SONG_VISUALIZER_A1",
 };
 
 const diffViewsStore = create((set) => ({
