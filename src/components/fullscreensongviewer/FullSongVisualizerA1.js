@@ -215,86 +215,110 @@ export const BgImage = ({ playerRef }) => {
       try {
         // Use global audio context and analyzer to prevent multiple source creation
         if (!globalAudioContext) {
-          globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+          globalAudioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
           globalAnalyser = globalAudioContext.createAnalyser();
-          
+
           // Configure analyzer
           globalAnalyser.fftSize = 512;
           globalAnalyser.smoothingTimeConstant = 0.8;
           const bufferLength = globalAnalyser.frequencyBinCount;
           globalDataArray = new Uint8Array(bufferLength);
-          
+
           // Create media source from audio element only once globally
           try {
-            globalSource = globalAudioContext.createMediaElementSource(audioEle);
+            globalSource =
+              globalAudioContext.createMediaElementSource(audioEle);
             globalSource.connect(globalAnalyser);
             globalAnalyser.connect(globalAudioContext.destination);
-            console.log('Global audio analysis setup completed');
+            console.log("Global audio analysis setup completed");
           } catch (error) {
-            console.error('Failed to create media source:', error);
+            console.error("Failed to create media source:", error);
             return;
           }
         }
-        
+
         // Start analysis loop if not already running
         if (!animationIdRef.current) {
           const analyze = () => {
             if (globalAnalyser && globalDataArray) {
               try {
+                // Get frequency data
                 globalAnalyser.getByteFrequencyData(globalDataArray);
-                
+
                 const bufferLength = globalDataArray.length;
-                
-                // Calculate frequency ranges
-                const lowEnd = Math.floor(bufferLength * 0.1); // 0-10% for low frequencies
-                const midEnd = Math.floor(bufferLength * 0.4); // 10-40% for mid frequencies
-                // 40-100% for high frequencies
-                
-                // Calculate energy for each frequency range
-                let lowEnergy = 0;
-                let midEnergy = 0;
-                let highEnergy = 0;
-                
-                // Low frequencies (bass)
-                for (let i = 0; i < lowEnd; i++) {
-                  lowEnergy += globalDataArray[i];
+                const sampleRate = globalAudioContext.sampleRate; // VERY IMPORTANT
+
+                // --- ACCURATE: Frequency -> Index mapping ---
+                function freqToIndex(freq) {
+                  const nyquist = sampleRate / 2;
+                  return Math.min(
+                    bufferLength - 1,
+                    Math.max(0, Math.round((freq / nyquist) * bufferLength))
+                  );
                 }
-                lowEnergy = lowEnergy / lowEnd / 255; // Normalize to 0-1
-                
-                // Mid frequencies
-                for (let i = lowEnd; i < midEnd; i++) {
-                  midEnergy += globalDataArray[i];
+
+                // --- REAL WORLD AUDIO RANGES ---
+                const LOW_START = 20;
+                const LOW_END = 250;
+
+                const MID_START = 250;
+                const MID_END = 4000;
+
+                const HIGH_START = 4000;
+                const HIGH_END = 20000;
+
+                // Convert to indexes
+                const lowStartIndex = freqToIndex(LOW_START);
+                const lowEndIndex = freqToIndex(LOW_END);
+
+                const midStartIndex = freqToIndex(MID_START);
+                const midEndIndex = freqToIndex(MID_END);
+
+                const highStartIndex = freqToIndex(HIGH_START);
+                const highEndIndex = freqToIndex(HIGH_END);
+
+                // --- ENERGY CALCULATIONS ---
+                function getEnergy(start, end) {
+                  let sum = 0;
+                  let count = 0;
+                  for (let i = start; i < end; i++) {
+                    sum += globalDataArray[i];
+                    count++;
+                  }
+                  return count > 0 ? sum / count / 255 : 0; // normalized 0-1
                 }
-                midEnergy = midEnergy / (midEnd - lowEnd) / 255; // Normalize to 0-1
-                
-                // High frequencies
-                for (let i = midEnd; i < bufferLength; i++) {
-                  highEnergy += globalDataArray[i];
-                }
-                highEnergy = highEnergy / (bufferLength - midEnd) / 255; // Normalize to 0-1
-                
-                // Apply the exact formula requested
-                const newOpacity = 0.1 + Math.max(lowEnergy, midEnergy, highEnergy) * 0.8;
+
+                const lowEnergy = getEnergy(lowStartIndex, lowEndIndex);
+                const midEnergy = getEnergy(midStartIndex, midEndIndex);
+                const highEnergy = getEnergy(highStartIndex, highEndIndex);
+
+                // --- YOUR OPACITY FORMULA (unchanged) ---
+                const newOpacity = Math.max(
+                  0,
+                  Math.min(highEnergy + (lowEnergy * midEnergy + 0.0001), 1)
+                );
+
                 setOpacity(newOpacity);
               } catch (error) {
-                console.error('Error in analysis loop:', error);
+                console.error("Error in analysis loop:", error);
               }
             }
             animationIdRef.current = requestAnimationFrame(analyze);
           };
-          
+
           analyze();
-          console.log('Analysis loop started');
+          console.log("Analysis loop started");
         }
       } catch (error) {
-        console.error('Error setting up audio analysis:', error);
+        console.error("Error setting up audio analysis:", error);
         setOpacity(0.75); // Fallback opacity
       }
     };
 
     // Setup when audio starts playing
     const handlePlay = () => {
-      if (globalAudioContext?.state === 'suspended') {
+      if (globalAudioContext?.state === "suspended") {
         globalAudioContext.resume();
       }
       if (!globalAnalyser) {
@@ -311,8 +335,8 @@ export const BgImage = ({ playerRef }) => {
       setupAudioAnalysis();
     }
 
-    audioEle.addEventListener('play', handlePlay);
-    audioEle.addEventListener('pause', handlePause);
+    audioEle.addEventListener("play", handlePlay);
+    audioEle.addEventListener("pause", handlePause);
 
     return () => {
       if (animationIdRef.current) {
@@ -320,8 +344,8 @@ export const BgImage = ({ playerRef }) => {
         animationIdRef.current = null;
       }
       // Don't close the global audio context as it's shared
-      audioEle.removeEventListener('play', handlePlay);
-      audioEle.removeEventListener('pause', handlePause);
+      audioEle.removeEventListener("play", handlePlay);
+      audioEle.removeEventListener("pause", handlePause);
     };
   }, [playerRef]); // Removed 'song' dependency to prevent re-setup on song changes
 
@@ -347,7 +371,7 @@ export const BgImage = ({ playerRef }) => {
   return (
     <img
       ref={imgRef}
-      className="shadow-inner absolute top-0 left-0 object-cover object-center blur-xl w-screen h-screen rounded-xl opacity-0 transition-opacity duration-100"
+      className="shadow-inner absolute top-0 left-0 object-cover object-center blur-md w-screen h-screen rounded-xl opacity-0 transition-opacity duration-100"
       style={{ opacity: opacity }}
       src={get_src_uri(song.album.thumbnail1200x1200)}
       alt="thumbnail"
