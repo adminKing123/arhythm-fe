@@ -203,7 +203,7 @@ let globalSource = null;
 export const BgImage = ({ playerRef }) => {
   const imgRef = useRef(null);
   const song = playerStore((state) => state.song);
-  const [opacity, setOpacity] = useState(0.75);
+  const [opacity, setOpacity] = useState(0);
   const animationIdRef = useRef(null);
 
   // Audio analysis setup
