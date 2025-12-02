@@ -301,7 +301,7 @@ export const BgImage = ({ playerRef }) => {
                 // );
 
                 // base driven
-                const newOpacity = Math.min(1, (lowEnergy * 1.3 + midEnergy * 0.4) ** 1.1);
+                const newOpacity = Math.min(1, lowEnergy * 0.15 + midEnergy * 0.15 + highEnergy * 0.70);
 
                 setOpacity(newOpacity);
               } catch (error) {
