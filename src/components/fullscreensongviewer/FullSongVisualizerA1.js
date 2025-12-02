@@ -200,11 +200,79 @@ let globalAnalyser = null;
 let globalDataArray = null;
 let globalSource = null;
 
+const FreqMultiplers = {
+  low: 0.15,
+  mid: 0.15,
+  high: 0.70,
+}
+
+const FreqMultiplierControls = ({ onUpdate }) => {
+  const [multipliers, setMultipliers] = useState({
+    low: 0.15,
+    mid: 0.15,
+    high: 0.70,
+  });
+
+  const handleChange = (key, value) => {
+    const newMultipliers = { ...multipliers, [key]: value };
+    setMultipliers(newMultipliers);
+    onUpdate(newMultipliers);
+  };
+
+  return (
+    <div className="absolute top-4 right-4 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/50 rounded-lg p-4 backdrop-blur-sm">
+      <div className="text-white text-xs mb-2">Frequency Multipliers</div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <label className="text-white text-xs w-8">Low:</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={multipliers.low}
+            onChange={(e) => handleChange('low', parseFloat(e.target.value))}
+            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+          />
+          <span className="text-white text-xs w-8">{multipliers.low.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-white text-xs w-8">Mid:</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={multipliers.mid}
+            onChange={(e) => handleChange('mid', parseFloat(e.target.value))}
+            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+          />
+          <span className="text-white text-xs w-8">{multipliers.mid.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-white text-xs w-8">High:</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={multipliers.high}
+            onChange={(e) => handleChange('high', parseFloat(e.target.value))}
+            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+          />
+          <span className="text-white text-xs w-8">{multipliers.high.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const BgImage = ({ playerRef }) => {
   const imgRef = useRef(null);
   const song = playerStore((state) => state.song);
   const [opacity, setOpacity] = useState(0);
   const animationIdRef = useRef(null);
+  const [currentMultipliers, setCurrentMultipliers] = useState(FreqMultiplers);
 
   // Audio analysis setup
   useEffect(() => {
@@ -301,7 +369,7 @@ export const BgImage = ({ playerRef }) => {
                 // );
 
                 // base driven
-                const newOpacity = Math.min(1, lowEnergy * 0.15 + midEnergy * 0.15 + highEnergy * 0.70);
+                const newOpacity = Math.min(1, lowEnergy * currentMultipliers.low + midEnergy * currentMultipliers.mid + highEnergy * currentMultipliers.high);
 
                 setOpacity(newOpacity);
               } catch (error) {
@@ -351,7 +419,7 @@ export const BgImage = ({ playerRef }) => {
       audioEle.removeEventListener("play", handlePlay);
       audioEle.removeEventListener("pause", handlePause);
     };
-  }, [playerRef]); // Removed 'song' dependency to prevent re-setup on song changes
+  }, [playerRef, currentMultipliers.low, currentMultipliers.mid, currentMultipliers.high]); // Removed 'song' dependency to prevent re-setup on song changes
 
   useEffect(() => {
     const imgEle = imgRef.current;
@@ -373,14 +441,17 @@ export const BgImage = ({ playerRef }) => {
   }, [imgRef, song]);
 
   return (
-    <img
-      ref={imgRef}
-      className="shadow-inner absolute top-0 left-0 object-cover object-center blur-[2px] w-screen h-screen rounded-xl"
-      style={{ opacity: opacity }}
-      src={get_src_uri(song.album.thumbnail1200x1200)}
-      alt="thumbnail"
-      onContextMenu={(e) => e.preventDefault()}
-    />
+    <>
+      <img
+        ref={imgRef}
+        className="shadow-inner absolute top-0 left-0 object-cover object-center blur-[2px] w-screen h-screen rounded-xl"
+        style={{ opacity: opacity }}
+        src={get_src_uri(song.album.thumbnail1200x1200)}
+        alt="thumbnail"
+        onContextMenu={(e) => e.preventDefault()}
+      />
+      <FreqMultiplierControls onUpdate={setCurrentMultipliers} />
+    </>
   );
 };
 
