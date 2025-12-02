@@ -371,7 +371,7 @@ export const BgImage = ({ playerRef }) => {
   return (
     <img
       ref={imgRef}
-      className="shadow-inner absolute top-0 left-0 object-cover object-center blur-md w-screen h-screen rounded-xl opacity-0 transition-opacity duration-100"
+      className="shadow-inner absolute top-0 left-0 object-cover object-center blur-[2px] w-screen h-screen rounded-xl"
       style={{ opacity: opacity }}
       src={get_src_uri(song.album.thumbnail1200x1200)}
       alt="thumbnail"
