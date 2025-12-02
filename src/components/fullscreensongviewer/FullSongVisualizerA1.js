@@ -294,11 +294,14 @@ export const BgImage = ({ playerRef }) => {
                 const highEnergy = getEnergy(highStartIndex, highEndIndex);
 
                 // --- YOUR OPACITY FORMULA (unchanged) ---
-                const newOpacity = Math.min(
-                  1,
-                  (lowEnergy * 0.4 + midEnergy * 0.35 + highEnergy * 0.25) ** 1.2
-                );
+                // smooth
+                // const newOpacity = Math.min(
+                //   1,
+                //   (lowEnergy * 0.4 + midEnergy * 0.35 + highEnergy * 0.25) ** 1.2
+                // );
 
+                // base driven
+                const newOpacity = Math.min(1, (lowEnergy * 1.3 + midEnergy * 0.4) ** 1.1);
 
                 setOpacity(newOpacity);
               } catch (error) {
