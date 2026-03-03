@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import AudioMotionAnalyzer from "audiomotion-analyzer";
 import { formatPlayerTime, get_src_uri } from "../../api/utils";
 import playerStore from "../../zstore/playerStore";
 import {
@@ -194,217 +195,80 @@ const CurrentSongImage = ({ song }) => {
   );
 };
 
-// Global audio analyzer to prevent multiple source creation
-let globalAudioContext = null;
-let globalAnalyser = null;
-let globalDataArray = null;
-let globalSource = null;
-
-const FreqMultiplers = {
-  low: 0.15,
-  mid: 0.15,
-  high: 0.70,
-}
-
-const FreqMultiplierControls = ({ onUpdate }) => {
-  const [multipliers, setMultipliers] = useState({
-    low: 0.15,
-    mid: 0.15,
-    high: 0.70,
-  });
-
-  const handleChange = (key, value) => {
-    const newMultipliers = { ...multipliers, [key]: value };
-    setMultipliers(newMultipliers);
-    onUpdate(newMultipliers);
-  };
-
-  return (
-    <div className="absolute top-4 right-4 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/50 rounded-lg p-4 backdrop-blur-sm">
-      <div className="text-white text-xs mb-2">Frequency Multipliers</div>
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <label className="text-white text-xs w-8">Low:</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={multipliers.low}
-            onChange={(e) => handleChange('low', parseFloat(e.target.value))}
-            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-          />
-          <span className="text-white text-xs w-8">{multipliers.low.toFixed(2)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="text-white text-xs w-8">Mid:</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={multipliers.mid}
-            onChange={(e) => handleChange('mid', parseFloat(e.target.value))}
-            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-          />
-          <span className="text-white text-xs w-8">{multipliers.mid.toFixed(2)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="text-white text-xs w-8">High:</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={multipliers.high}
-            onChange={(e) => handleChange('high', parseFloat(e.target.value))}
-            className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-          />
-          <span className="text-white text-xs w-8">{multipliers.high.toFixed(2)}</span>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Global AudioMotionAnalyzer instance to prevent multiple source creation
+let globalAudioMotion = null;
 
 export const BgImage = ({ playerRef }) => {
   const imgRef = useRef(null);
   const song = playerStore((state) => state.song);
   const [opacity, setOpacity] = useState(0);
   const animationIdRef = useRef(null);
-  const [currentMultipliers, setCurrentMultipliers] = useState(FreqMultiplers);
+  const containerRef = useRef(null);
 
-  // Audio analysis setup
+  // AudioMotionAnalyzer setup
   useEffect(() => {
     const audioEle = playerRef?.current?.audio?.current;
-    if (!audioEle) return;
+    if (!audioEle || !containerRef.current) return;
 
-    const setupAudioAnalysis = () => {
+    const setupAudioMotion = () => {
       try {
-        // Use global audio context and analyzer to prevent multiple source creation
-        if (!globalAudioContext) {
-          globalAudioContext = new (window.AudioContext ||
-            window.webkitAudioContext)();
-          globalAnalyser = globalAudioContext.createAnalyser();
-
-          // Configure analyzer
-          globalAnalyser.fftSize = 512;
-          globalAnalyser.smoothingTimeConstant = 0.8;
-          const bufferLength = globalAnalyser.frequencyBinCount;
-          globalDataArray = new Uint8Array(bufferLength);
-
-          // Create media source from audio element only once globally
-          try {
-            globalSource =
-              globalAudioContext.createMediaElementSource(audioEle);
-            globalSource.connect(globalAnalyser);
-            globalAnalyser.connect(globalAudioContext.destination);
-            console.log("Global audio analysis setup completed");
-          } catch (error) {
-            console.error("Failed to create media source:", error);
-            return;
-          }
+        if (!globalAudioMotion) {
+          globalAudioMotion = new AudioMotionAnalyzer(containerRef.current, {
+            source: audioEle,
+            mode: 3, // Octave bands mode
+            fftSize: 8192,
+            smoothing: 0.8,
+            showScaleX: false,
+            showScaleY: false,
+            showBgColor: false,
+            overlay: true,
+            bgAlpha: 0,
+            // Hide the visualizer canvas - we only need energy data
+            height: 1,
+            width: 1,
+          });
+          console.log("AudioMotionAnalyzer setup completed");
         }
 
-        // Start analysis loop if not already running
+        // Start analysis loop
         if (!animationIdRef.current) {
           const analyze = () => {
-            if (globalAnalyser && globalDataArray) {
+            if (globalAudioMotion) {
               try {
-                // Get frequency data
-                globalAnalyser.getByteFrequencyData(globalDataArray);
+                // Get energy from different frequency bands
+                const lowEnergy = globalAudioMotion.getEnergy("bass");
+                const midEnergy = globalAudioMotion.getEnergy("midrange");
+                const highEnergy = globalAudioMotion.getEnergy("treble");
 
-                const bufferLength = globalDataArray.length;
-                const sampleRate = globalAudioContext.sampleRate; // VERY IMPORTANT
-
-                // --- ACCURATE: Frequency -> Index mapping ---
-                function freqToIndex(freq) {
-                  const nyquist = sampleRate / 2;
-                  return Math.min(
-                    bufferLength - 1,
-                    Math.max(0, Math.round((freq / nyquist) * bufferLength))
-                  );
-                }
-
-                // --- REAL WORLD AUDIO RANGES ---
-                const LOW_START = 20;
-                const LOW_END = 250;
-
-                const MID_START = 250;
-                const MID_END = 4000;
-
-                const HIGH_START = 4000;
-                const HIGH_END = 20000;
-
-                // Convert to indexes
-                const lowStartIndex = freqToIndex(LOW_START);
-                const lowEndIndex = freqToIndex(LOW_END);
-
-                const midStartIndex = freqToIndex(MID_START);
-                const midEndIndex = freqToIndex(MID_END);
-
-                const highStartIndex = freqToIndex(HIGH_START);
-                const highEndIndex = freqToIndex(HIGH_END);
-
-                // --- ENERGY CALCULATIONS ---
-                function getEnergy(start, end) {
-                  let sum = 0;
-                  let count = 0;
-                  for (let i = start; i < end; i++) {
-                    sum += globalDataArray[i];
-                    count++;
-                  }
-                  return count > 0 ? sum / count / 255 : 0; // normalized 0-1
-                }
-
-                const lowEnergy = getEnergy(lowStartIndex, lowEndIndex);
-                const midEnergy = getEnergy(midStartIndex, midEndIndex);
-                const highEnergy = getEnergy(highStartIndex, highEndIndex);
-
-                // --- YOUR OPACITY FORMULA (unchanged) ---
-                // smooth
-                // const newOpacity = Math.min(
-                //   1,
-                //   (lowEnergy * 0.4 + midEnergy * 0.35 + highEnergy * 0.25) ** 1.2
-                // );
-
-                // base driven
-                const newOpacity = Math.min(1, lowEnergy * currentMultipliers.low + midEnergy * currentMultipliers.mid + highEnergy * currentMultipliers.high);
-
-                setOpacity(newOpacity);
+                // const newOpacity = 0.1 + Math.max(lowEnergy, midEnergy, highEnergy) * 0.8;
+                const newOpacity = Math.max(lowEnergy, midEnergy, highEnergy) * 0.8;
+                setOpacity(Math.min(1, newOpacity));
               } catch (error) {
                 console.error("Error in analysis loop:", error);
               }
             }
             animationIdRef.current = requestAnimationFrame(analyze);
           };
-
           analyze();
-          console.log("Analysis loop started");
         }
       } catch (error) {
-        console.error("Error setting up audio analysis:", error);
-        setOpacity(0.75); // Fallback opacity
+        console.error("Error setting up AudioMotionAnalyzer:", error);
+        setOpacity(0.75);
       }
     };
 
-    // Setup when audio starts playing
     const handlePlay = () => {
-      if (globalAudioContext?.state === "suspended") {
-        globalAudioContext.resume();
-      }
-      if (!globalAnalyser) {
-        setupAudioAnalysis();
+      if (!globalAudioMotion) {
+        setupAudioMotion();
       }
     };
 
     const handlePause = () => {
-      setOpacity(0.1); // Set to minimum when paused
+      setOpacity(0.1);
     };
 
-    // Check if audio is already playing
     if (!audioEle.paused) {
-      setupAudioAnalysis();
+      setupAudioMotion();
     }
 
     audioEle.addEventListener("play", handlePlay);
@@ -415,11 +279,10 @@ export const BgImage = ({ playerRef }) => {
         cancelAnimationFrame(animationIdRef.current);
         animationIdRef.current = null;
       }
-      // Don't close the global audio context as it's shared
       audioEle.removeEventListener("play", handlePlay);
       audioEle.removeEventListener("pause", handlePause);
     };
-  }, [playerRef, currentMultipliers.low, currentMultipliers.mid, currentMultipliers.high]); // Removed 'song' dependency to prevent re-setup on song changes
+  }, [playerRef]);
 
   useEffect(() => {
     const imgEle = imgRef.current;
@@ -442,15 +305,16 @@ export const BgImage = ({ playerRef }) => {
 
   return (
     <>
+      {/* Hidden container for AudioMotionAnalyzer */}
+      <div ref={containerRef} className="absolute top-0 left-0 w-0 h-0 overflow-hidden" />
       <img
         ref={imgRef}
         className="shadow-inner absolute top-0 left-0 object-cover object-center blur-[2px] w-screen h-screen rounded-xl"
-        style={{ opacity: opacity }}
+        style={{ opacity: opacity, filter: "blur(2px)" }}
         src={get_src_uri(song.album.thumbnail1200x1200)}
         alt="thumbnail"
         onContextMenu={(e) => e.preventDefault()}
       />
-      <FreqMultiplierControls onUpdate={setCurrentMultipliers} />
     </>
   );
 };
