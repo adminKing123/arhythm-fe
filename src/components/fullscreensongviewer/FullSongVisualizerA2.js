@@ -119,17 +119,7 @@ export const GradientBackground = ({ playerRef }) => {
       />
       <div className="absolute inset-0 overflow-hidden bg-[#020617] pointer-events-none">
         <div
-          className="absolute bottom-[-20%] left-[-15%] rounded-full pointer-events-none mix-blend-screen w-[50vw] h-[50vw] min-w-[350px] min-h-[350px] will-change-[transform,opacity,filter]"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(239, 68, 68, 1) 0%, rgba(220, 38, 38, 0.5) 45%, rgba(0,0,0,0) 75%)",
-            transform: `scale(${bulbs.red.scale})`,
-            opacity: bulbs.red.opacity,
-            filter: `blur(${bulbs.red.blur}px)`,
-          }}
-        />
-        <div
-          className="absolute bottom-[-20%] left-1/2 rounded-full pointer-events-none mix-blend-screen w-[55vw] h-[55vw] min-w-[400px] min-h-[400px] will-change-[transform,opacity,filter]"
+          className="absolute bottom-[-20%] left-[16.666%] rounded-full pointer-events-none mix-blend-screen w-[50vw] h-[50vw] min-w-[350px] min-h-[350px] will-change-[transform,opacity,filter]"
           style={{
             background:
               "radial-gradient(circle, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 0.5) 45%, rgba(0,0,0,0) 75%)",
@@ -139,11 +129,21 @@ export const GradientBackground = ({ playerRef }) => {
           }}
         />
         <div
-          className="absolute bottom-[-20%] right-[-15%] rounded-full pointer-events-none mix-blend-screen w-[50vw] h-[50vw] min-w-[350px] min-h-[350px] will-change-[transform,opacity,filter]"
+          className="absolute bottom-[-20%] left-1/2 rounded-full pointer-events-none mix-blend-screen w-[50vw] h-[50vw] min-w-[350px] min-h-[350px] will-change-[transform,opacity,filter]"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(239, 68, 68, 1) 0%, rgba(220, 38, 38, 0.5) 45%, rgba(0,0,0,0) 75%)",
+            transform: `translateX(-50%) scale(${bulbs.red.scale})`,
+            opacity: bulbs.red.opacity,
+            filter: `blur(${bulbs.red.blur}px)`,
+          }}
+        />
+        <div
+          className="absolute bottom-[-20%] left-[83.333%] rounded-full pointer-events-none mix-blend-screen w-[50vw] h-[50vw] min-w-[350px] min-h-[350px] will-change-[transform,opacity,filter]"
           style={{
             background:
               "radial-gradient(circle, rgba(34, 197, 94, 1) 0%, rgba(16, 185, 129, 0.5) 45%, rgba(0,0,0,0) 75%)",
-            transform: `scale(${bulbs.green.scale})`,
+            transform: `translateX(-50%) scale(${bulbs.green.scale})`,
             opacity: bulbs.green.opacity,
             filter: `blur(${bulbs.green.blur}px)`,
           }}
