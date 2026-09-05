@@ -38,48 +38,234 @@ const buildBulbGradient = (color) => {
   return `radial-gradient(circle, rgba(${color.r}, ${color.g}, ${color.b}, 1) 0%, rgba(${dark.r}, ${dark.g}, ${dark.b}, 0.5) 45%, rgba(0,0,0,0) 75%)`;
 };
 
-const getRegionAverageColor = (data, width, height, startX, endX) => {
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  let count = 0;
+const rgbToHsl = (r, g, b) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
 
-  const sample = (includeAll) => {
-    r = 0;
-    g = 0;
-    b = 0;
-    count = 0;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
 
-    for (let y = 0; y < height; y++) {
-      for (let x = Math.floor(startX); x < Math.floor(endX); x++) {
-        const i = (y * width + x) * 4;
-        const pr = data[i];
-        const pg = data[i + 1];
-        const pb = data[i + 2];
-        const pa = data[i + 3];
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
-        if (pa < 128) continue;
-
-        const brightness = (pr + pg + pb) / 3;
-        if (!includeAll && (brightness < 20 || brightness > 240)) continue;
-
-        r += pr;
-        g += pg;
-        b += pb;
-        count++;
-      }
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      default:
+        h = ((r - g) / d + 4) / 6;
+        break;
     }
+  }
+
+  return { h: h * 360, s, l };
+};
+
+const hslToRgb = (h, s, l) => {
+  h = ((h % 360) + 360) % 360;
+  h /= 360;
+
+  if (s === 0) {
+    const gray = Math.round(l * 255);
+    return { r: gray, g: gray, b: gray };
+  }
+
+  const hueToRgb = (p, q, t) => {
+    let temp = t;
+    if (temp < 0) temp += 1;
+    if (temp > 1) temp -= 1;
+    if (temp < 1 / 6) return p + (q - p) * 6 * temp;
+    if (temp < 1 / 2) return q;
+    if (temp < 2 / 3) return p + (q - p) * (2 / 3 - temp) * 6;
+    return p;
   };
 
-  sample(false);
-  if (count === 0) sample(true);
-  if (count === 0) return null;
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
 
   return {
-    r: Math.round(r / count),
-    g: Math.round(g / count),
-    b: Math.round(b / count),
+    r: Math.round(hueToRgb(p, q, h + 1 / 3) * 255),
+    g: Math.round(hueToRgb(p, q, h) * 255),
+    b: Math.round(hueToRgb(p, q, h - 1 / 3) * 255),
   };
+};
+
+const colorDistance = (a, b) =>
+  Math.sqrt((a.r - b.r) ** 2 + (a.g - b.g) ** 2 + (a.b - b.b) ** 2);
+
+const sampleVibrantPixels = (data, width, height, relaxed = false) => {
+  const pixels = [];
+  const step = 2;
+
+  for (let y = 0; y < height; y += step) {
+    for (let x = 0; x < width; x += step) {
+      const i = (y * width + x) * 4;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const a = data[i + 3];
+
+      if (a < 128) continue;
+
+      const { s, l } = rgbToHsl(r, g, b);
+      if (l < 0.06 || l > 0.94) continue;
+      if (!relaxed && s < 0.14) continue;
+
+      pixels.push({
+        r,
+        g,
+        b,
+        weight: relaxed ? 1 : s * (1 - Math.abs(l - 0.5) * 0.8),
+      });
+    }
+  }
+
+  return pixels;
+};
+
+const pickInitialCentroids = (pixels) => {
+  if (!pixels.length) return null;
+
+  const sorted = [...pixels].sort((a, b) => b.weight - a.weight);
+  const centroids = [{ r: sorted[0].r, g: sorted[0].g, b: sorted[0].b }];
+
+  while (centroids.length < 3) {
+    let bestPixel = null;
+    let bestDistance = -1;
+
+    for (const pixel of sorted) {
+      const nearestDistance = Math.min(
+        ...centroids.map((centroid) => colorDistance(pixel, centroid))
+      );
+
+      if (nearestDistance > bestDistance) {
+        bestDistance = nearestDistance;
+        bestPixel = pixel;
+      }
+    }
+
+    if (!bestPixel || bestDistance < 35) break;
+
+    centroids.push({ r: bestPixel.r, g: bestPixel.g, b: bestPixel.b });
+  }
+
+  while (centroids.length < 3) {
+    const last = centroids[centroids.length - 1];
+    const { h, s, l } = rgbToHsl(last.r, last.g, last.b);
+    centroids.push(hslToRgb(h + centroids.length * 95, Math.max(s, 0.55), l));
+  }
+
+  return centroids;
+};
+
+const kMeansColors = (pixels, k = 3, iterations = 16) => {
+  let centroids = pickInitialCentroids(pixels);
+  if (!centroids) return null;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const clusters = Array.from({ length: k }, () => ({
+      r: 0,
+      g: 0,
+      b: 0,
+      weight: 0,
+    }));
+
+    for (const pixel of pixels) {
+      let bestIndex = 0;
+      let bestDistance = Infinity;
+
+      for (let i = 0; i < k; i++) {
+        const distance = colorDistance(pixel, centroids[i]);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = i;
+        }
+      }
+
+      const weight = pixel.weight || 1;
+      clusters[bestIndex].r += pixel.r * weight;
+      clusters[bestIndex].g += pixel.g * weight;
+      clusters[bestIndex].b += pixel.b * weight;
+      clusters[bestIndex].weight += weight;
+    }
+
+    centroids = clusters.map((cluster, index) => {
+      if (cluster.weight === 0) return centroids[index];
+      return {
+        r: Math.round(cluster.r / cluster.weight),
+        g: Math.round(cluster.g / cluster.weight),
+        b: Math.round(cluster.b / cluster.weight),
+      };
+    });
+  }
+
+  return centroids;
+};
+
+const enhanceColor = (color) => {
+  const { h, s, l } = rgbToHsl(color.r, color.g, color.b);
+
+  if (s < 0.08) {
+    return {
+      r: Math.min(255, Math.round(color.r * 1.15 + 10)),
+      g: Math.min(255, Math.round(color.g * 1.15 + 10)),
+      b: Math.min(255, Math.round(color.b * 1.15 + 10)),
+    };
+  }
+
+  return hslToRgb(h, Math.min(1, s * 1.4 + 0.1), Math.min(0.62, Math.max(0.36, l)));
+};
+
+const ensureDistinctColors = (colors) => {
+  const distinct = colors.map((color) => ({ ...color }));
+
+  for (let i = 1; i < distinct.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (colorDistance(distinct[i], distinct[j]) >= 55) continue;
+
+      const base = rgbToHsl(distinct[j].r, distinct[j].g, distinct[j].b);
+      distinct[i] = hslToRgb(
+        base.h + (i - j) * 72,
+        Math.max(base.s, 0.55),
+        Math.min(0.6, Math.max(0.38, base.l))
+      );
+    }
+  }
+
+  return distinct;
+};
+
+const assignColorsToBulbs = (colors) => {
+  const sorted = ensureDistinctColors(colors.map(enhanceColor)).sort(
+    (a, b) => rgbToHsl(a.r, a.g, a.b).h - rgbToHsl(b.r, b.g, b.b).h
+  );
+
+  return {
+    blue: sorted[0],
+    red: sorted[1],
+    green: sorted[2],
+  };
+};
+
+const extractDistinctColors = (data, width, height) => {
+  let pixels = sampleVibrantPixels(data, width, height);
+  if (pixels.length < 18) {
+    pixels = sampleVibrantPixels(data, width, height, true);
+  }
+  if (!pixels.length) return null;
+
+  const clusters = kMeansColors(pixels);
+  if (!clusters) return null;
+
+  return assignColorsToBulbs(clusters);
 };
 
 const extractColorsFromImage = (imageUrl) =>
@@ -90,7 +276,7 @@ const extractColorsFromImage = (imageUrl) =>
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
-        const size = 60;
+        const size = 100;
         canvas.width = size;
         canvas.height = size;
 
@@ -102,18 +288,14 @@ const extractColorsFromImage = (imageUrl) =>
 
         ctx.drawImage(img, 0, 0, size, size);
         const { data } = ctx.getImageData(0, 0, size, size);
-        const third = size / 3;
+        const colors = extractDistinctColors(data, size, size);
 
-        const blue = getRegionAverageColor(data, size, size, 0, third);
-        const red = getRegionAverageColor(data, size, size, third, third * 2);
-        const green = getRegionAverageColor(data, size, size, third * 2, size);
-
-        if (!blue || !red || !green) {
-          reject(new Error("Could not extract colors from image regions"));
+        if (!colors) {
+          reject(new Error("Could not extract distinct colors from image"));
           return;
         }
 
-        resolve({ blue, red, green });
+        resolve(colors);
       } catch (error) {
         reject(error);
       }
@@ -232,8 +414,8 @@ export const GradientBackground = ({ playerRef }) => {
                 );
 
                 setBulbs({
-                  red: getBulbStyle(bassNorm),
-                  blue: getBulbStyle(midNorm),
+                  blue: getBulbStyle(bassNorm),
+                  red: getBulbStyle(midNorm),
                   green: getBulbStyle(trebleNorm),
                 });
               } catch (error) {
