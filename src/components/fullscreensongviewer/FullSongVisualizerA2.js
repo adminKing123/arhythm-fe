@@ -414,8 +414,8 @@ export const GradientBackground = ({ playerRef }) => {
                 );
 
                 setBulbs({
-                  blue: getBulbStyle(bassNorm),
-                  red: getBulbStyle(midNorm),
+                  red: getBulbStyle(bassNorm),
+                  blue: getBulbStyle(midNorm),
                   green: getBulbStyle(trebleNorm),
                 });
               } catch (error) {
