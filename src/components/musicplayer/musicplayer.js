@@ -25,6 +25,7 @@ import authConfigStore from "../../zstore/authConfigStore";
 import FullScreenSongViewer from "../fullscreensongviewer/fullscreensongviewer";
 import FullScreenSongShortVideo from "../fullscreensongviewer/FullScreenSongShortVideo";
 import FullSongVisualizerA1 from "../fullscreensongviewer/FullSongVisualizerA1";
+import FullSongVisualizerA2 from "../fullscreensongviewer/FullSongVisualizerA2";
 import ROUTES from "../../router/routes";
 import { useNavigate } from "react-router-dom";
 
@@ -499,6 +500,7 @@ const MusicPlayer = () => {
       <FullScreenSongViewer playerRef={playerRef} />
       <FullScreenSongShortVideo playerRef={playerRef} />
       <FullSongVisualizerA1 playerRef={playerRef} />
+      <FullSongVisualizerA2 playerRef={playerRef} />
     </>
   );
 };
